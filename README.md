@@ -15,7 +15,8 @@ npm run dev
 
 Visit:
 
-`/templates/luxury-salon-centre`
+- `/templates/luxury-salon-centre`
+- `/templates/modern-minimal-salon`
 
 ## Recommended workspace flow
 

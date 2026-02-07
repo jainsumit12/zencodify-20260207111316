@@ -9,6 +9,11 @@ export default function HomePage() {
       </p>
       <ul className="mt-8 space-y-3 text-sm sm:text-base">
         <li>
+          <Link className="text-luxury-goldDark hover:underline" href="/templates/modern-minimal-salon">
+            Modern Minimal Salon
+          </Link>
+        </li>
+        <li>
           <Link className="text-luxury-goldDark hover:underline" href="/templates/luxury-salon-centre">
             Luxury Salon Centre
           </Link>
