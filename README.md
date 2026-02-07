@@ -17,6 +17,7 @@ Visit:
 
 - `/templates/luxury-salon-centre`
 - `/templates/modern-minimal-salon`
+- `/templates/bold-trendy-salon`
 
 ## Recommended workspace flow
 
