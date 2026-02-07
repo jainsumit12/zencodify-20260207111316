@@ -1,0 +1,13 @@
+{
+  "name": "zencodify",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter @zencodify/shared build && concurrently \"pnpm --filter @zencodify/backend dev\" \"pnpm --filter @zencodify/frontend dev\"",
+    "build": "pnpm --filter @zencodify/shared build && pnpm --filter @zencodify/backend build && pnpm --filter @zencodify/frontend build",
+    "lint": "pnpm --filter @zencodify/shared build && pnpm -r run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
