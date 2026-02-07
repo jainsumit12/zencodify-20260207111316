@@ -1,5 +1,9 @@
 import React from "react";
-import { SiteSpecSchema, type SiteSpec } from "@zencodify/shared";
+import {
+  SiteSpecSchema,
+  migrateGalleryStringsToImages,
+  type SiteSpec
+} from "@zencodify/shared";
 
 export type TemplateId =
   | "luxury-salon-centre"
@@ -26,7 +30,8 @@ const rendererRegistry: Record<TemplateId, () => Promise<RendererModule>> = {
 };
 
 export function parseSiteSpec(input: unknown): SiteSpec {
-  return SiteSpecSchema.parse(input);
+  const migrated = migrateGalleryStringsToImages(input);
+  return SiteSpecSchema.parse(migrated);
 }
 
 export function getTemplateRoute(templateId: TemplateId, pageSlug: PageSlug): string {

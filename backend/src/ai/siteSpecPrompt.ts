@@ -70,6 +70,15 @@ Required JSON top-level shape:
     "logoUrl"?: string,
     "coverImageUrl"?: string
   },
+  "social"?: {
+    "website"?: string,
+    "instagram"?: string,
+    "facebook"?: string,
+    "youtube"?: string,
+    "linkedin"?: string,
+    "x"?: string,
+    "googleMaps"?: string
+  },
   "seo": {
     "title": string,
     "description": string,
@@ -89,15 +98,18 @@ Allowed section objects:
 - trust_strip: { "type":"trust_strip", "items":[string, ...] }
 - services: { "type":"services", "items":[{ "name":string, "description"?:string, "price"?:string }, ...] }
 - feature: { "type":"feature", "heading":string, "description":string, "bullets"?:[string,...], "imageUrl"?:string, "ctaText"?:string, "ctaHref"?:string }
-- gallery: { "type":"gallery", "images":[string, ...] }
+- gallery: { "type":"gallery", "title"?:string, "layout"?:"grid"|"masonry"|"carousel", "images":[{ "url":string, "alt"?:string, "caption"?:string }, ...] }
+- images: { "type":"images", "title"?:string, "layout"?:"strip"|"grid"|"stack", "images":[{ "url":string, "alt"?:string, "caption"?:string }, ...] }
 - about: { "type":"about", "content":string }
 - testimonials: { "type":"testimonials", "items":[{ "name":string, "quote":string }, ...] }
 - offer_banner: { "type":"offer_banner", "message":string, "ctaText"?:string, "ctaHref"?:string }
 - contact: { "type":"contact", "heading"?:string, "description"?:string, "showPhone"?:boolean, "showWhatsapp"?:boolean }
+- social_links: { "type":"social_links", "title"?:string, "links": { "website"?:string, "instagram"?:string, "facebook"?:string, "youtube"?:string, "linkedin"?:string, "x"?:string, "googleMaps"?:string } }
 - faq: { "type":"faq", "items":[{ "question":string, "answer":string }, ...] }
 
 Section requirements:
 - Home page "/" must include: hero, trust_strip, services, feature, gallery, testimonials, offer_banner, contact, faq.
+- Include root-level "social" object with at least instagram, facebook, googleMaps URLs.
 - If siteType is "multipage", also include:
   - "/about" page with about, testimonials (faq optional)
   - "/services" page with services, feature, faq
@@ -108,7 +120,7 @@ Section requirements:
 Quality requirements:
 - Make content realistic for ${input.city}, India.
 - Include at least 5 service items with ₹ prices.
-- Include at least 6 gallery image URLs.
+- Include at least 6 gallery image objects with url keys.
 - Include at least 3 testimonials.
 - Include at least 3 FAQ items.
 

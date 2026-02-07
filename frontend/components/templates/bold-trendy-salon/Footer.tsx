@@ -1,5 +1,8 @@
 import Link from "next/link";
-import type { BoldNavItem } from "@/data/templates/bold-trendy-salon";
+import type {
+  BoldNavItem,
+  BoldSocialLinks
+} from "@/data/templates/bold-trendy-salon";
 
 type FooterProps = {
   brandName: string;
@@ -9,6 +12,7 @@ type FooterProps = {
   whatsappNumber: string;
   address: string;
   businessHours: string[];
+  social?: BoldSocialLinks;
   quickLinksTitle: string;
   contactTitle: string;
   hoursTitle: string;
@@ -23,11 +27,22 @@ export default function Footer({
   whatsappNumber,
   address,
   businessHours,
+  social,
   quickLinksTitle,
   contactTitle,
   hoursTitle,
   copyright
 }: FooterProps) {
+  const socialEntries = [
+    ["website", social?.website],
+    ["instagram", social?.instagram],
+    ["facebook", social?.facebook],
+    ["youtube", social?.youtube],
+    ["linkedin", social?.linkedin],
+    ["x", social?.x],
+    ["google maps", social?.googleMaps]
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+
   return (
     <footer className="border-t border-white/10 bg-[#05040b] py-14">
       <div className="shell-container">
@@ -76,6 +91,26 @@ export default function Footer({
             </ul>
           </div>
         </div>
+        {socialEntries.length > 0 ? (
+          <div className="mt-8 border-t border-white/10 pt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c3afff]">
+              Social
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {socialEntries.map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-white/25 px-3 py-1.5 text-xs text-white/80 hover:text-white"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <p className="mt-10 border-t border-white/10 pt-6 text-xs text-white/50">© {new Date().getFullYear()} {copyright}</p>
       </div>

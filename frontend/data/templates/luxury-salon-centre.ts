@@ -13,9 +13,20 @@ export type ServiceItem = {
 };
 
 export type GalleryItem = {
-  id: string;
-  src: string;
-  alt: string;
+  id?: string;
+  url: string;
+  alt?: string;
+  caption?: string;
+};
+
+export type TemplateSocialLinks = {
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  youtube?: string;
+  linkedin?: string;
+  x?: string;
+  googleMaps?: string;
 };
 
 export type TestimonialItem = {
@@ -39,7 +50,9 @@ export interface LuxurySalonCentreTemplateData {
   whatsappNumber: string;
   phoneNumber: string;
   address: string;
+  logoUrl?: string;
   businessHours: string[];
+  social: TemplateSocialLinks;
   navigation: {
     logoText: string;
     links: TemplateNavItem[];
@@ -142,11 +155,18 @@ export const LuxurySalonCentreData: LuxurySalonCentreTemplateData = {
   whatsappNumber: "919876543210",
   phoneNumber: "+91 98765 43210",
   address: "Unit 14, Pearl Avenue, Bandra West, Mumbai 400050",
+  logoUrl:
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80",
   businessHours: [
     "Mon - Fri: 10:00 AM - 8:00 PM",
     "Sat: 9:00 AM - 9:00 PM",
     "Sun: 10:00 AM - 6:00 PM"
   ],
+  social: {
+    instagram: "https://instagram.com/luxurysaloncentre",
+    facebook: "https://facebook.com/luxurysaloncentre",
+    googleMaps: "https://maps.google.com/?q=Luxury+Salon+Centre+Mumbai"
+  },
   navigation: {
     logoText: "Luxury Salon Centre",
     links: [
@@ -277,52 +297,52 @@ export const LuxurySalonCentreData: LuxurySalonCentreTemplateData = {
     images: [
       {
         id: "gal-1",
-        src: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80",
         alt: "Client with styled hair in salon chair"
       },
       {
         id: "gal-2",
-        src: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80",
         alt: "Makeup brush set arranged on vanity table"
       },
       {
         id: "gal-3",
-        src: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
         alt: "Bride portrait with professional makeup"
       },
       {
         id: "gal-4",
-        src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
         alt: "Hair styling tools on premium salon station"
       },
       {
         id: "gal-5",
-        src: "https://images.unsplash.com/photo-1498843053639-170ff2122f35?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1498843053639-170ff2122f35?auto=format&fit=crop&w=900&q=80",
         alt: "Nail art close-up with golden accents"
       },
       {
         id: "gal-6",
-        src: "https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?auto=format&fit=crop&w=900&q=80",
         alt: "Skincare facial session with mask treatment"
       },
       {
         id: "gal-7",
-        src: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=900&q=80",
         alt: "Luxury salon interior and styling mirrors"
       },
       {
         id: "gal-8",
-        src: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=900&q=80",
         alt: "Bridal hairstyle detail with accessories"
       },
       {
         id: "gal-9",
-        src: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80",
         alt: "Stylist blow drying with volume finish"
       },
       {
         id: "gal-10",
-        src: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
         alt: "Portrait shot of finished bridal makeup"
       }
     ],

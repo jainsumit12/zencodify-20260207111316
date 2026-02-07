@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import OpenAI from "openai";
-import { SiteSpecSchema } from "@zencodify/shared";
+import { SiteSpecSchema, migrateGalleryStringsToImages } from "@zencodify/shared";
 import { buildSiteSpecPrompt } from "../ai/siteSpecPrompt";
 
 type DemoGenerateBody = {
@@ -220,7 +220,8 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
-    const parsed = SiteSpecSchema.safeParse(parsedJson);
+    const migrated = migrateGalleryStringsToImages(parsedJson);
+    const parsed = SiteSpecSchema.safeParse(migrated);
     if (!parsed.success) {
       return reply.status(422).send({
         ok: false,

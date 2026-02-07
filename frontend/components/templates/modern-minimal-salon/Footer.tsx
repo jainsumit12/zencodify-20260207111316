@@ -1,5 +1,8 @@
 import Link from "next/link";
-import type { MinimalNavItem } from "@/data/templates/modern-minimal-salon";
+import type {
+  MinimalNavItem,
+  MinimalSocialLinks
+} from "@/data/templates/modern-minimal-salon";
 
 type FooterProps = {
   brandName: string;
@@ -9,6 +12,7 @@ type FooterProps = {
   whatsappNumber: string;
   address: string;
   businessHours: string[];
+  social?: MinimalSocialLinks;
   quickLinksTitle: string;
   contactTitle: string;
   hoursTitle: string;
@@ -23,11 +27,22 @@ export default function Footer({
   whatsappNumber,
   address,
   businessHours,
+  social,
   quickLinksTitle,
   contactTitle,
   hoursTitle,
   copyright
 }: FooterProps) {
+  const socialEntries = [
+    ["website", social?.website],
+    ["instagram", social?.instagram],
+    ["facebook", social?.facebook],
+    ["youtube", social?.youtube],
+    ["linkedin", social?.linkedin],
+    ["x", social?.x],
+    ["google maps", social?.googleMaps]
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+
   return (
     <footer className="mt-10 border-t border-[#ece6ef] bg-white py-14">
       <div className="shell-container">
@@ -76,6 +91,26 @@ export default function Footer({
             </ul>
           </div>
         </div>
+        {socialEntries.length > 0 ? (
+          <div className="mt-8 border-t border-[#ede7f0] pt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6d5f7a]">
+              Social
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {socialEntries.map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-[#ddd3e2] px-3 py-1.5 text-xs text-[#534b5d] hover:text-[#1d1b22]"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <p className="mt-10 border-t border-[#ede7f0] pt-6 text-xs text-[#7a7183]">© {new Date().getFullYear()} {copyright}</p>
       </div>

@@ -25,9 +25,20 @@ export type MinimalTeamMember = {
 };
 
 export type MinimalGalleryItem = {
-  id: string;
-  src: string;
-  alt: string;
+  id?: string;
+  url: string;
+  alt?: string;
+  caption?: string;
+};
+
+export type MinimalSocialLinks = {
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  youtube?: string;
+  linkedin?: string;
+  x?: string;
+  googleMaps?: string;
 };
 
 export type MinimalTestimonialItem = {
@@ -55,7 +66,9 @@ export interface ModernMinimalSalonTemplateData {
   whatsappNumber: string;
   phoneNumber: string;
   address: string;
+  logoUrl?: string;
   businessHours: string[];
+  social: MinimalSocialLinks;
   navigation: {
     logoText: string;
     links: MinimalNavItem[];
@@ -156,11 +169,18 @@ export const ModernMinimalSalonData: ModernMinimalSalonTemplateData = {
   whatsappNumber: "919945551122",
   phoneNumber: "+91 99455 51122",
   address: "22 Bloom Street, Indiranagar, Bengaluru 560038",
+  logoUrl:
+    "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=400&q=80",
   businessHours: [
     "Mon - Fri: 9:30 AM - 8:00 PM",
     "Sat: 9:00 AM - 8:30 PM",
     "Sun: 10:00 AM - 6:00 PM"
   ],
+  social: {
+    instagram: "https://instagram.com/modernminimalsalon",
+    facebook: "https://facebook.com/modernminimalsalon",
+    googleMaps: "https://maps.google.com/?q=Modern+Minimal+Salon+Bengaluru"
+  },
   navigation: {
     logoText: "Modern Minimal Salon",
     links: [
@@ -365,52 +385,52 @@ export const ModernMinimalSalonData: ModernMinimalSalonTemplateData = {
     images: [
       {
         id: "mms-g1",
-        src: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80",
         alt: "Salon mirror and styling station"
       },
       {
         id: "mms-g2",
-        src: "https://images.unsplash.com/photo-1470259078422-826894b933aa?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1470259078422-826894b933aa?auto=format&fit=crop&w=900&q=80",
         alt: "Blowout styling in progress"
       },
       {
         id: "mms-g3",
-        src: "https://images.unsplash.com/photo-1493256338651-d82f7acb2b38?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1493256338651-d82f7acb2b38?auto=format&fit=crop&w=900&q=80",
         alt: "Makeup tools and pastel beauty products"
       },
       {
         id: "mms-g4",
-        src: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=900&q=80",
         alt: "Client hair color reveal"
       },
       {
         id: "mms-g5",
-        src: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=900&q=80",
         alt: "Nail service close-up"
       },
       {
         id: "mms-g6",
-        src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
         alt: "Salon products on white shelf"
       },
       {
         id: "mms-g7",
-        src: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=900&q=80",
         alt: "Bright salon interior"
       },
       {
         id: "mms-g8",
-        src: "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=900&q=80",
         alt: "Hair styling detail"
       },
       {
         id: "mms-g9",
-        src: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=900&q=80",
         alt: "Skincare treatment setup"
       },
       {
         id: "mms-g10",
-        src: "https://images.unsplash.com/photo-1529041942456-1d7ad34f0f7f?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1529041942456-1d7ad34f0f7f?auto=format&fit=crop&w=900&q=80",
         alt: "Minimal makeup portrait"
       }
     ],

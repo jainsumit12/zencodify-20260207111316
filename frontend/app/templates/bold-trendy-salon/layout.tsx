@@ -31,6 +31,7 @@ export default function BoldTrendySalonLayout({ children }: BoldTrendySalonLayou
         whatsappNumber={BoldTrendySalonData.whatsappNumber}
         address={BoldTrendySalonData.address}
         businessHours={BoldTrendySalonData.businessHours}
+        social={BoldTrendySalonData.social}
         quickLinksTitle={BoldTrendySalonData.footer.quickLinksTitle}
         contactTitle={BoldTrendySalonData.footer.contactTitle}
         hoursTitle={BoldTrendySalonData.footer.hoursTitle}

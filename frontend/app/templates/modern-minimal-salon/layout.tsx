@@ -34,6 +34,7 @@ export default function ModernMinimalSalonLayout({ children }: ModernMinimalSalo
         whatsappNumber={ModernMinimalSalonData.whatsappNumber}
         address={ModernMinimalSalonData.address}
         businessHours={ModernMinimalSalonData.businessHours}
+        social={ModernMinimalSalonData.social}
         quickLinksTitle={ModernMinimalSalonData.footer.quickLinksTitle}
         contactTitle={ModernMinimalSalonData.footer.contactTitle}
         hoursTitle={ModernMinimalSalonData.footer.hoursTitle}

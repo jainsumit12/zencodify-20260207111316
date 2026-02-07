@@ -1,6 +1,6 @@
 import "dotenv/config";
 import Fastify from "fastify";
-import { SiteSpecSchema } from "@zencodify/shared";
+import { SiteSpecSchema, migrateGalleryStringsToImages } from "@zencodify/shared";
 import { demoRoutes } from "./routes/demo";
 
 const app = Fastify({
@@ -12,7 +12,8 @@ app.get("/health", async () => {
 });
 
 app.post("/validate", async (request, reply) => {
-  const result = SiteSpecSchema.safeParse(request.body);
+  const migrated = migrateGalleryStringsToImages(request.body);
+  const result = SiteSpecSchema.safeParse(migrated);
 
   if (!result.success) {
     return reply.status(400).send({

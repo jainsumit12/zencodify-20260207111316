@@ -33,9 +33,20 @@ export type BoldReelItem = {
 };
 
 export type BoldGalleryItem = {
-  id: string;
-  src: string;
-  alt: string;
+  id?: string;
+  url: string;
+  alt?: string;
+  caption?: string;
+};
+
+export type BoldSocialLinks = {
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  youtube?: string;
+  linkedin?: string;
+  x?: string;
+  googleMaps?: string;
 };
 
 export type BoldTestimonialItem = {
@@ -63,7 +74,9 @@ export interface BoldTrendySalonTemplateData {
   whatsappNumber: string;
   phoneNumber: string;
   address: string;
+  logoUrl?: string;
   businessHours: string[];
+  social: BoldSocialLinks;
   navigation: {
     logoText: string;
     links: BoldNavItem[];
@@ -170,11 +183,18 @@ export const BoldTrendySalonData: BoldTrendySalonTemplateData = {
   whatsappNumber: "919811112233",
   phoneNumber: "+91 98111 12233",
   address: "A-19 Studio Lane, Hauz Khas, New Delhi 110016",
+  logoUrl:
+    "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=400&q=80",
   businessHours: [
     "Mon - Fri: 10:00 AM - 9:00 PM",
     "Sat: 9:00 AM - 10:00 PM",
     "Sun: 10:00 AM - 7:00 PM"
   ],
+  social: {
+    instagram: "https://instagram.com/boldtrendysalon",
+    facebook: "https://facebook.com/boldtrendysalon",
+    googleMaps: "https://maps.google.com/?q=Bold+Trendy+Salon+Delhi"
+  },
   navigation: {
     logoText: "Bold Trendy Salon",
     links: [
@@ -395,52 +415,52 @@ export const BoldTrendySalonData: BoldTrendySalonTemplateData = {
     images: [
       {
         id: "bts-g1",
-        src: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80",
         alt: "Hair styling close-up"
       },
       {
         id: "bts-g2",
-        src: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
         alt: "Makeup portrait"
       },
       {
         id: "bts-g3",
-        src: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=900&q=80",
         alt: "Nail art close-up"
       },
       {
         id: "bts-g4",
-        src: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=900&q=80",
         alt: "Bridal hairstyle"
       },
       {
         id: "bts-g5",
-        src: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=900&q=80",
         alt: "Skincare treatment setup"
       },
       {
         id: "bts-g6",
-        src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80",
         alt: "Salon station setup"
       },
       {
         id: "bts-g7",
-        src: "https://images.unsplash.com/photo-1498843053639-170ff2122f35?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1498843053639-170ff2122f35?auto=format&fit=crop&w=900&q=80",
         alt: "Fashion nails"
       },
       {
         id: "bts-g8",
-        src: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=900&q=80",
         alt: "Blow dry styling"
       },
       {
         id: "bts-g9",
-        src: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
         alt: "Studio portrait"
       },
       {
         id: "bts-g10",
-        src: "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=900&q=80",
         alt: "Hair movement shot"
       }
     ],

@@ -73,12 +73,19 @@ export default function GalleryGrid({
           <div className="columns-1 gap-4 sm:columns-2 lg:columns-4">
             {displayImages.map((image, index) => (
               <button
-                key={image.id}
+                key={image.id ?? image.url}
                 type="button"
                 onClick={() => setActiveIndex(index)}
+                title={image.caption ?? image.alt ?? "Gallery image"}
                 className="mb-4 block w-full overflow-hidden rounded-2xl border border-white/10"
               >
-                <Image src={image.src} alt={image.alt} width={900} height={1200} className="h-auto w-full object-cover" />
+                <Image
+                  src={image.url}
+                  alt={image.alt ?? "Gallery image"}
+                  width={900}
+                  height={1200}
+                  className="h-auto w-full object-cover"
+                />
               </button>
             ))}
           </div>
@@ -86,14 +93,15 @@ export default function GalleryGrid({
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {displayImages.map((image, index) => (
               <button
-                key={image.id}
+                key={image.id ?? image.url}
                 type="button"
                 onClick={() => setActiveIndex(index)}
+                title={image.caption ?? image.alt ?? "Gallery image"}
                 className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10"
               >
                 <Image
-                  src={image.src}
-                  alt={image.alt}
+                  src={image.url}
+                  alt={image.alt ?? "Gallery image"}
                   width={900}
                   height={900}
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
@@ -125,12 +133,17 @@ export default function GalleryGrid({
           </button>
 
           <Image
-            src={displayImages[activeIndex].src}
-            alt={displayImages[activeIndex].alt}
+            src={displayImages[activeIndex].url}
+            alt={displayImages[activeIndex].alt ?? "Gallery image"}
             width={1700}
             height={1300}
             className="max-h-[85vh] w-auto max-w-full rounded-2xl object-contain"
           />
+          {displayImages[activeIndex].caption ? (
+            <p className="absolute bottom-6 rounded-full bg-black/45 px-4 py-2 text-xs text-white">
+              {displayImages[activeIndex].caption}
+            </p>
+          ) : null}
 
           <button
             type="button"

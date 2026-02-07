@@ -1,5 +1,23 @@
 import { z } from "zod";
 
+const UrlSchema = z.string().url();
+
+const ImageSchema = z.object({
+  url: UrlSchema,
+  alt: z.string().max(120).optional(),
+  caption: z.string().max(160).optional()
+});
+
+const SocialLinksSchema = z.object({
+  website: UrlSchema.optional(),
+  instagram: UrlSchema.optional(),
+  facebook: UrlSchema.optional(),
+  youtube: UrlSchema.optional(),
+  linkedin: UrlSchema.optional(),
+  x: UrlSchema.optional(),
+  googleMaps: UrlSchema.optional()
+});
+
 const SlugSchema = z
   .string()
   .regex(
@@ -37,14 +55,14 @@ const BusinessSchema = z.object({
   phone: z.string().min(1),
   whatsapp: z.string().min(1),
   address: z.string().min(1),
-  logoUrl: z.string().url().optional(),
-  coverImageUrl: z.string().url().optional()
+  logoUrl: UrlSchema.optional(),
+  coverImageUrl: UrlSchema.optional()
 });
 
 const SeoSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
-  ogImageUrl: z.string().url().optional()
+  ogImageUrl: UrlSchema.optional()
 });
 
 const HeroSectionSchema = z.object({
@@ -78,14 +96,23 @@ const FeatureSectionSchema = z.object({
   heading: z.string().min(1),
   description: z.string().min(1),
   bullets: z.array(z.string().min(1)).optional(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: UrlSchema.optional(),
   ctaText: z.string().optional(),
   ctaHref: z.string().optional()
 });
 
 const GallerySectionSchema = z.object({
   type: z.literal("gallery"),
-  images: z.array(z.string().min(1)).min(1)
+  title: z.string().optional(),
+  layout: z.enum(["grid", "masonry", "carousel"]).optional(),
+  images: z.array(ImageSchema).min(1)
+});
+
+const ImagesSectionSchema = z.object({
+  type: z.literal("images"),
+  title: z.string().optional(),
+  layout: z.enum(["strip", "grid", "stack"]).optional(),
+  images: z.array(ImageSchema).min(1)
 });
 
 const AboutSectionSchema = z.object({
@@ -120,6 +147,12 @@ const ContactSectionSchema = z.object({
   showWhatsapp: z.boolean().optional()
 });
 
+const SocialSectionSchema = z.object({
+  type: z.literal("social_links"),
+  title: z.string().optional(),
+  links: SocialLinksSchema
+});
+
 const FaqSectionSchema = z.object({
   type: z.literal("faq"),
   items: z
@@ -138,10 +171,12 @@ export const SectionSchema = z.discriminatedUnion("type", [
   ServicesSectionSchema,
   FeatureSectionSchema,
   GallerySectionSchema,
+  ImagesSectionSchema,
   AboutSectionSchema,
   TestimonialsSectionSchema,
   OfferBannerSectionSchema,
   ContactSectionSchema,
+  SocialSectionSchema,
   FaqSectionSchema
 ]);
 
@@ -158,6 +193,7 @@ export const SiteSpecSchema = z
     siteType: z.enum(["one_page", "multipage"]),
     theme: ThemeSchema,
     business: BusinessSchema,
+    social: SocialLinksSchema.optional(),
     seo: SeoSchema,
     pages: z.array(PageSchema).min(1)
   })

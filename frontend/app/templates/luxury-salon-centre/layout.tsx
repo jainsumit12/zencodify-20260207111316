@@ -31,6 +31,7 @@ export default function TemplateLayout({ children }: TemplateLayoutProps) {
         whatsappNumber={LuxurySalonCentreData.whatsappNumber}
         address={LuxurySalonCentreData.address}
         businessHours={LuxurySalonCentreData.businessHours}
+        social={LuxurySalonCentreData.social}
         quickLinksTitle={LuxurySalonCentreData.footer.quickLinksTitle}
         contactTitle={LuxurySalonCentreData.footer.contactTitle}
         hoursTitle={LuxurySalonCentreData.footer.hoursTitle}
