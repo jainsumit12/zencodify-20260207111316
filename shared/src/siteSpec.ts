@@ -73,6 +73,16 @@ const ServicesSectionSchema = z.object({
     .min(1)
 });
 
+const FeatureSectionSchema = z.object({
+  type: z.literal("feature"),
+  heading: z.string().min(1),
+  description: z.string().min(1),
+  bullets: z.array(z.string().min(1)).optional(),
+  imageUrl: z.string().url().optional(),
+  ctaText: z.string().optional(),
+  ctaHref: z.string().optional()
+});
+
 const GallerySectionSchema = z.object({
   type: z.literal("gallery"),
   images: z.array(z.string().min(1)).min(1)
@@ -126,6 +136,7 @@ export const SectionSchema = z.discriminatedUnion("type", [
   HeroSectionSchema,
   TrustStripSectionSchema,
   ServicesSectionSchema,
+  FeatureSectionSchema,
   GallerySectionSchema,
   AboutSectionSchema,
   TestimonialsSectionSchema,

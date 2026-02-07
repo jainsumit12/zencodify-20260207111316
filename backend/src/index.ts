@@ -1,5 +1,7 @@
+import "dotenv/config";
 import Fastify from "fastify";
 import { SiteSpecSchema } from "@zencodify/shared";
+import { demoRoutes } from "./routes/demo";
 
 const app = Fastify({
   logger: true
@@ -24,6 +26,7 @@ app.post("/validate", async (request, reply) => {
 
 const start = async () => {
   try {
+    await demoRoutes(app);
     await app.listen({ port: 4000, host: "0.0.0.0" });
   } catch (error) {
     app.log.error(error);
