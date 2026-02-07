@@ -2,19 +2,25 @@
 
 Monorepo scaffold for a SaaS project with:
 
-- `frontend/`: Next.js (App Router + TypeScript + ESLint)
+- `frontend/`: Next.js (App Router + TypeScript + Tailwind CSS + ESLint)
 - `backend/`: Fastify + TypeScript API
 - `shared/`: shared Zod schemas/types (`@zencodify/shared`)
 
-## Setup
+## Template Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+Visit:
+
+`/templates/luxury-salon-centre`
+
+## Recommended workspace flow
 
 ```bash
 pnpm install
-```
-
-## Run in development
-
-```bash
 pnpm dev
 ```
 
