@@ -25,38 +25,59 @@ export default function AdminPreviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zencodify_admin_spec");
+      console.log("Loaded admin spec:", raw?.slice(0, 200));
+
+      if (!raw) {
+        setSpec(null);
+        setError("❌ No generated spec found. Go back to /admin and generate.");
+        setLoading(false);
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as unknown;
+      const validated = parseSiteSpec(parsed);
+      setSpec(validated);
+      setError(null);
+    } catch (err: unknown) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message || "Failed to load admin spec");
+      } else {
+        setError("Failed to load admin spec");
+      }
+      setSpec(null);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
+      if (!spec) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
-      setError(null);
       setRenderedPage(null);
 
       try {
-        const rawSpec = localStorage.getItem("zencodify_admin_spec");
-        if (!rawSpec) {
-          throw new Error(
-            "No admin spec found in local storage. Go to /admin and generate a site first."
-          );
-        }
-
-        const parsedJson = JSON.parse(rawSpec) as unknown;
-        const validatedSpec = parseSiteSpec(parsedJson);
-        const rendered = await renderTemplate(validatedSpec, pageSlug);
-
+        const rendered = await renderTemplate(spec, pageSlug);
         if (!cancelled) {
-          setSpec(validatedSpec);
           setRenderedPage(rendered);
+          setError(null);
         }
-      } catch (previewError) {
-        const message =
-          previewError instanceof Error
-            ? previewError.message
-            : "Failed to load admin preview.";
-
+      } catch (err: unknown) {
+        console.error(err);
         if (!cancelled) {
-          setError(message);
-          setSpec(null);
+          if (err instanceof Error) {
+            setError(err.message || "Failed to render preview");
+          } else {
+            setError("Failed to render preview");
+          }
         }
       } finally {
         if (!cancelled) {
@@ -70,7 +91,23 @@ export default function AdminPreviewPage() {
     return () => {
       cancelled = true;
     };
-  }, [pageSlug]);
+  }, [pageSlug, spec]);
+
+  if (!spec && error) {
+    return (
+      <main className="shell-container py-12 sm:py-16">
+        <div className="mx-auto max-w-2xl rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+          <p className="text-sm font-medium">{error}</p>
+          <Link
+            href="/admin"
+            className="mt-4 inline-flex rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white"
+          >
+            Back to /admin
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="shell-container py-12 sm:py-16">
@@ -115,7 +152,7 @@ export default function AdminPreviewPage() {
 
       {loading ? <p className="text-sm text-luxury-base/70">Rendering preview...</p> : null}
 
-      {error ? (
+      {error && spec ? (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>

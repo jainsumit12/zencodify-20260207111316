@@ -1,9 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { parseSiteSpec, type TemplateId } from "@/template-engine/renderTemplate";
-import { patchGeneratedSpec } from "@/lib/specPatch";
+import { useState } from "react";
+import type { TemplateId } from "@/template-engine/renderTemplate";
 
 type SiteType = "multipage" | "one_page";
 
@@ -83,97 +81,69 @@ const SAMPLE_FORM_STATE: AdminFormState = {
   ].join("\n")
 };
 
-function toStringList(value: string, splitByComma: boolean): string[] | undefined {
-  const tokens = (splitByComma ? value.split(/\r?\n|,/) : value.split(/\r?\n/))
-    .map((token) => token.trim())
-    .filter((token) => token.length > 0);
-
-  return tokens.length > 0 ? tokens : undefined;
-}
-
 export default function AdminPage() {
-  const router = useRouter();
   const [form, setForm] = useState<AdminFormState>(INITIAL_FORM_STATE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const apiBase = useMemo(
-    () => process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
-    []
-  );
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${apiBase}/demo/generate-sitespec`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          templateId: form.templateId,
-          siteType: form.siteType,
-          businessName: form.businessName.trim(),
-          category: form.category.trim(),
-          city: form.city.trim(),
-          address: form.address.trim(),
-          phone: form.phone.trim(),
-          whatsapp: form.whatsapp.trim(),
-          hours: toStringList(form.hours, true),
-          services: toStringList(form.services, true)
-        })
+      const formData = new FormData(e.currentTarget);
+      const raw = Object.fromEntries(formData.entries());
+
+      const payload: Record<string, FormDataEntryValue> = {};
+      Object.entries(raw).forEach(([k, v]) => {
+        if (v !== "" && v !== null && v !== undefined) payload[k] = v;
       });
 
-      const payload = (await response.json().catch(() => ({}))) as {
-        message?: string;
-        missingFields?: string[];
-        spec?: unknown;
-      };
+      console.log("Sending payload →", payload);
 
-      if (!response.ok) {
-        const missingFields =
-          payload.missingFields && payload.missingFields.length > 0
-            ? ` Missing: ${payload.missingFields.join(", ")}.`
-            : "";
-        throw new Error((payload.message || "Failed to generate SiteSpec.") + missingFields);
-      }
-
-      if (!payload.spec) {
-        throw new Error("Backend did not return a spec payload.");
-      }
-
-      const generatedSpec = parseSiteSpec(payload.spec);
-      const patchedSpec = patchGeneratedSpec(generatedSpec, {
-        logoUrl: form.logoUrl,
-        coverImageUrl: form.coverImageUrl,
-        galleryImageUrls: toStringList(form.galleryImageUrls, false),
-        social: {
-          website: form.website,
-          instagram: form.instagram,
-          facebook: form.facebook,
-          youtube: form.youtube,
-          linkedin: form.linkedin,
-          x: form.x,
-          googleMaps: form.googleMaps
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/demo/generate-sitespec`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
         }
-      });
+      );
 
-      const finalSpec = parseSiteSpec(patchedSpec);
-      localStorage.setItem("zencodify_admin_spec", JSON.stringify(finalSpec));
-      router.push("/admin/preview");
-    } catch (submitError) {
-      const message =
-        submitError instanceof Error
-          ? submitError.message
-          : "Unexpected error while generating admin preview.";
-      setError(message);
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.error("Backend error:", json);
+        throw new Error(
+          typeof json?.error === "string"
+            ? json.error
+            : typeof json?.message === "string"
+              ? json.message
+              : "Failed to generate site"
+        );
+      }
+
+      if (!json?.spec) {
+        throw new Error("No SiteSpec returned");
+      }
+
+      localStorage.setItem("zencodify_admin_spec", JSON.stringify(json.spec));
+
+      console.log("SiteSpec saved → redirecting preview");
+
+      window.location.href = "/admin/preview";
+    } catch (err: unknown) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message || "Something went wrong");
+      } else {
+        setError("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const inputClassName =
     "mt-1.5 w-full rounded-xl border border-[#dacfe5] bg-white px-3 py-2.5 text-sm text-[#2b2233] outline-none focus:border-[#8d6ac8]";
@@ -185,7 +155,7 @@ export default function AdminPage() {
           <div>
             <h1 className="font-heading text-3xl text-luxury-base sm:text-4xl">Admin Test Form</h1>
             <p className="mt-2 text-sm text-luxury-base/75 sm:text-base">
-              Generate a SiteSpec using backend AI, patch optional social/assets, and preview locally.
+              Generate a SiteSpec using backend AI and preview locally.
             </p>
           </div>
 
@@ -198,7 +168,7 @@ export default function AdminPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={onSubmit} className="mt-8 space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <section className="rounded-2xl border border-[#e8e0ee] bg-white p-5 shadow-soft sm:p-6">
               <h2 className="font-heading text-xl text-luxury-base">Template + Business</h2>
@@ -206,6 +176,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>Template</span>
                   <select
+                    name="templateId"
                     value={form.templateId}
                     onChange={(event) =>
                       setForm((prev) => ({
@@ -224,6 +195,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>Site Type</span>
                   <select
+                    name="siteType"
                     value={form.siteType}
                     onChange={(event) =>
                       setForm((prev) => ({
@@ -242,6 +214,7 @@ export default function AdminPage() {
                   <span>Business Name</span>
                   <input
                     required
+                    name="businessName"
                     value={form.businessName}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, businessName: event.target.value }))
@@ -254,6 +227,7 @@ export default function AdminPage() {
                   <span>Category</span>
                   <input
                     required
+                    name="category"
                     value={form.category}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, category: event.target.value }))
@@ -266,6 +240,7 @@ export default function AdminPage() {
                   <span>City</span>
                   <input
                     required
+                    name="city"
                     value={form.city}
                     onChange={(event) => setForm((prev) => ({ ...prev, city: event.target.value }))}
                     className={inputClassName}
@@ -276,6 +251,7 @@ export default function AdminPage() {
                   <span>Phone</span>
                   <input
                     required
+                    name="phone"
                     placeholder="+9198XXXXXXXX"
                     value={form.phone}
                     onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
@@ -287,6 +263,7 @@ export default function AdminPage() {
                   <span>WhatsApp</span>
                   <input
                     required
+                    name="whatsapp"
                     placeholder="+9198XXXXXXXX"
                     value={form.whatsapp}
                     onChange={(event) =>
@@ -300,6 +277,7 @@ export default function AdminPage() {
                   <span>Address</span>
                   <input
                     required
+                    name="address"
                     value={form.address}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, address: event.target.value }))
@@ -311,6 +289,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>Hours (optional)</span>
                   <textarea
+                    name="hours"
                     rows={3}
                     value={form.hours}
                     onChange={(event) => setForm((prev) => ({ ...prev, hours: event.target.value }))}
@@ -322,6 +301,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>Services (optional, comma/new line separated)</span>
                   <textarea
+                    name="services"
                     rows={4}
                     value={form.services}
                     onChange={(event) =>
@@ -340,6 +320,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>Website</span>
                   <input
+                    name="website"
                     value={form.website}
                     onChange={(event) => setForm((prev) => ({ ...prev, website: event.target.value }))}
                     className={inputClassName}
@@ -350,6 +331,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>Instagram</span>
                   <input
+                    name="instagram"
                     value={form.instagram}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, instagram: event.target.value }))
@@ -362,6 +344,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>Facebook</span>
                   <input
+                    name="facebook"
                     value={form.facebook}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, facebook: event.target.value }))
@@ -374,6 +357,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>YouTube</span>
                   <input
+                    name="youtube"
                     value={form.youtube}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, youtube: event.target.value }))
@@ -386,6 +370,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>LinkedIn</span>
                   <input
+                    name="linkedin"
                     value={form.linkedin}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, linkedin: event.target.value }))
@@ -398,6 +383,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>X</span>
                   <input
+                    name="x"
                     value={form.x}
                     onChange={(event) => setForm((prev) => ({ ...prev, x: event.target.value }))}
                     className={inputClassName}
@@ -408,6 +394,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80">
                   <span>Google Maps</span>
                   <input
+                    name="googleMaps"
                     value={form.googleMaps}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, googleMaps: event.target.value }))
@@ -420,6 +407,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>logoUrl (optional)</span>
                   <input
+                    name="logoUrl"
                     value={form.logoUrl}
                     onChange={(event) => setForm((prev) => ({ ...prev, logoUrl: event.target.value }))}
                     className={inputClassName}
@@ -430,6 +418,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>coverImageUrl (optional)</span>
                   <input
+                    name="coverImageUrl"
                     value={form.coverImageUrl}
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, coverImageUrl: event.target.value }))
@@ -442,6 +431,7 @@ export default function AdminPage() {
                 <label className="text-sm text-luxury-base/80 sm:col-span-2">
                   <span>galleryImageUrls (optional, one URL per line)</span>
                   <textarea
+                    name="galleryImageUrls"
                     rows={6}
                     value={form.galleryImageUrls}
                     onChange={(event) =>
@@ -462,11 +452,10 @@ export default function AdminPage() {
           ) : null}
 
           <button
-            type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-luxury-base px-5 py-3 text-sm font-semibold text-white transition hover:bg-luxury-base/90 disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-xl bg-black px-5 py-2 text-white disabled:opacity-50"
           >
-            {loading ? "Generating and preparing preview..." : "Generate + Open Preview"}
+            {loading ? "Generating AI Website..." : "Generate Website"}
           </button>
         </form>
       </div>
