@@ -113,8 +113,8 @@ export async function renderTemplate(
   }
 
   try {
-    const module = await loadRenderer();
-    const Renderer = module.default;
+    const rendererModule = await loadRenderer();
+    const Renderer = rendererModule.default;
 
     if (typeof Renderer !== "function") {
       return renderErrorCard(
