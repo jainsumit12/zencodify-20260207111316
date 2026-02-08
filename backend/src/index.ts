@@ -1,9 +1,39 @@
-import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import dotenv from "dotenv";
 
 import { SiteSpecSchema, migrateGalleryStringsToImages } from "@zencodify/shared";
 import { demoRoutes } from "./routes/demo";
+
+function loadEnvironment(): string | null {
+  const candidates = [
+    path.resolve(process.cwd(), ".env"),
+    path.resolve(process.cwd(), "backend/.env"),
+    path.resolve(__dirname, "../.env"),
+    path.resolve(__dirname, "../../backend/.env")
+  ];
+
+  const seen = new Set<string>();
+  for (const candidate of candidates) {
+    if (seen.has(candidate)) {
+      continue;
+    }
+    seen.add(candidate);
+    if (!fs.existsSync(candidate)) {
+      continue;
+    }
+
+    dotenv.config({ path: candidate });
+    return candidate;
+  }
+
+  dotenv.config();
+  return null;
+}
+
+const loadedEnvPath = loadEnvironment();
 
 const app = Fastify({
   logger: true
@@ -11,7 +41,8 @@ const app = Fastify({
 
 const start = async () => {
   try {
-    const PORT = 4010;
+    const parsedPort = Number(process.env.PORT);
+    const PORT = Number.isFinite(parsedPort) && parsedPort > 0 ? parsedPort : 4010;
 
     // ✅ register CORS INSIDE start()
     await app.register(cors, {
@@ -45,6 +76,12 @@ const start = async () => {
 
     // start server
     await app.listen({ port: PORT, host: "0.0.0.0" });
+
+    if (loadedEnvPath) {
+      app.log.info({ envPath: loadedEnvPath }, "Loaded environment file");
+    } else {
+      app.log.warn("No .env file found via known paths; using process environment only.");
+    }
 
     console.log(`🚀 Backend running on http://localhost:${PORT}`);
     console.log(`🧠 AI endpoint: http://localhost:${PORT}/demo/generate-sitespec`);

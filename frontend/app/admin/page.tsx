@@ -92,6 +92,7 @@ export default function AdminPage() {
     setError(null);
 
     try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4010";
       const formData = new FormData(e.currentTarget);
       const raw = Object.fromEntries(formData.entries());
 
@@ -102,14 +103,11 @@ export default function AdminPage() {
 
       console.log("Sending payload →", payload);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/demo/generate-sitespec`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload)
-        }
-      );
+      const res = await fetch(`${apiBase}/demo/generate-sitespec`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
       const json = await res.json().catch(() => ({}));
 

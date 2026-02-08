@@ -49,7 +49,7 @@ export default function DemoPage() {
     setError(null);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4010";
       const response = await fetch(`${apiBase}/demo/generate-sitespec`, {
         method: "POST",
         headers: {

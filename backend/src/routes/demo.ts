@@ -28,6 +28,24 @@ const REQUIRED_FIELDS: Array<keyof DemoGenerateBody> = [
 ];
 
 const VALID_SITE_TYPES = new Set(["one_page", "multipage"]);
+const REASONING_EFFORTS = ["minimal", "low", "medium", "high"] as const;
+const TEXT_VERBOSITIES = ["low", "medium", "high"] as const;
+
+type ReasoningEffort = (typeof REASONING_EFFORTS)[number];
+type TextVerbosity = (typeof TEXT_VERBOSITIES)[number];
+
+const DEFAULT_AI_TEMPERATURE = 0.7;
+const DEFAULT_AI_MAX_OUTPUT_TOKENS = 6000;
+const DEFAULT_AI_REASONING_EFFORT: ReasoningEffort = "minimal";
+const DEFAULT_AI_TEXT_VERBOSITY: TextVerbosity = "medium";
+
+const AI_SYSTEM_INSTRUCTIONS = [
+  "You are a senior website copywriter for salon and beauty businesses in India.",
+  "Create premium, realistic, conversion-focused content tailored to the provided city and business details.",
+  "Make each section specific and useful for customers who are considering booking.",
+  "Keep section copy concise and avoid unnecessary repetition so the full JSON response is complete.",
+  "Return valid JSON only and strictly follow all required keys and shapes."
+].join(" ");
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -51,6 +69,60 @@ function normalizeStringList(value: unknown): string[] | undefined {
   }
 
   return undefined;
+}
+
+function parseNumericEnv(
+  value: string | undefined,
+  fallback: number,
+  min: number,
+  max: number
+): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function parseReasoningEffort(value: string | undefined): ReasoningEffort {
+  if (!value) {
+    return DEFAULT_AI_REASONING_EFFORT;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if ((REASONING_EFFORTS as readonly string[]).includes(normalized)) {
+    return normalized as ReasoningEffort;
+  }
+
+  return DEFAULT_AI_REASONING_EFFORT;
+}
+
+function parseTextVerbosity(value: string | undefined): TextVerbosity {
+  if (!value) {
+    return DEFAULT_AI_TEXT_VERBOSITY;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if ((TEXT_VERBOSITIES as readonly string[]).includes(normalized)) {
+    return normalized as TextVerbosity;
+  }
+
+  return DEFAULT_AI_TEXT_VERBOSITY;
+}
+
+function supportsReasoningConfig(model: string): boolean {
+  const normalized = model.trim().toLowerCase();
+  return normalized.startsWith("gpt-5") || normalized.startsWith("o");
+}
+
+function supportsTemperatureConfig(model: string): boolean {
+  const normalized = model.trim().toLowerCase();
+  return !normalized.startsWith("gpt-5");
 }
 
 function compactSnippet(value: string, maxLength = 1200): string {
@@ -182,13 +254,41 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
     });
 
     const model = process.env.AI_MODEL || "gpt-5";
+    const temperature = parseNumericEnv(process.env.AI_TEMPERATURE, DEFAULT_AI_TEMPERATURE, 0, 2);
+    const maxOutputTokens = Math.round(
+      parseNumericEnv(process.env.AI_MAX_OUTPUT_TOKENS, DEFAULT_AI_MAX_OUTPUT_TOKENS, 1200, 12000)
+    );
+    const textVerbosity = parseTextVerbosity(process.env.AI_TEXT_VERBOSITY);
+    const reasoningEffort = parseReasoningEffort(process.env.AI_REASONING_EFFORT);
+    const reasoningEnabled = supportsReasoningConfig(model);
+    const temperatureEnabled = supportsTemperatureConfig(model);
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     let response: unknown;
     try {
+      request.log.info(
+        {
+          model,
+          temperature: temperatureEnabled ? temperature : "disabled_for_model",
+          maxOutputTokens,
+          textVerbosity,
+          reasoning: reasoningEnabled ? reasoningEffort : "disabled_for_model"
+        },
+        "Generating SiteSpec via OpenAI"
+      );
+
       response = await client.responses.create({
         model,
-        input: prompt
+        instructions: AI_SYSTEM_INSTRUCTIONS,
+        input: prompt,
+        max_output_tokens: maxOutputTokens,
+        text: {
+          format: { type: "json_object" },
+          verbosity: textVerbosity
+        },
+        truncation: "auto",
+        ...(temperatureEnabled ? { temperature } : {}),
+        ...(reasoningEnabled ? { reasoning: { effort: reasoningEffort } } : {})
       });
     } catch (error) {
       request.log.error({ error }, "OpenAI request failed");

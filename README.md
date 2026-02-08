@@ -29,7 +29,7 @@ pnpm dev
 ## URLs
 
 - Frontend: http://localhost:3000
-- Backend health: http://localhost:4000/health
+- Backend health: http://localhost:4010/health
 
 ## Local Demo Mode
 
@@ -38,6 +38,13 @@ pnpm dev
    - `cp frontend/.env.local.example frontend/.env.local`
 2. Add your OpenAI key in `backend/.env`:
    - `OPENAI_API_KEY=...`
+   - Optional generation tuning:
+     - `AI_MODEL=gpt-5`
+     - `AI_TEMPERATURE=0.7`
+     - `AI_MAX_OUTPUT_TOKENS=6000`
+     - `AI_REASONING_EFFORT=minimal` (`minimal|low|medium|high`)
+     - `AI_TEXT_VERBOSITY=medium` (`low|medium|high`)
+   - Note: `temperature` is applied only for models that support it.
 3. Install dependencies at workspace root:
    - `pnpm install`
 4. Start both apps:
@@ -46,4 +53,4 @@ pnpm dev
 Demo URLs:
 
 - Frontend form: http://localhost:3000/demo
-- Backend health: http://localhost:4000/health
+- Backend health: http://localhost:4010/health
