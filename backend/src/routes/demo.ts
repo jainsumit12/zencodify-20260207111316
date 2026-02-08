@@ -2,6 +2,12 @@ import type { FastifyInstance } from "fastify";
 import OpenAI from "openai";
 import { SiteSpecSchema, migrateGalleryStringsToImages } from "@zencodify/shared";
 import { buildSiteSpecPrompt } from "../ai/siteSpecPrompt";
+import {
+  buildGeneratedSpecCacheKey,
+  cacheGeneratedSpec,
+  getCachedGeneratedSpec,
+  saveGeneratedSpec
+} from "../storage";
 
 type DemoGenerateBody = {
   templateId?: unknown;
@@ -38,6 +44,7 @@ const DEFAULT_AI_TEMPERATURE = 0.7;
 const DEFAULT_AI_MAX_OUTPUT_TOKENS = 6000;
 const DEFAULT_AI_REASONING_EFFORT: ReasoningEffort = "minimal";
 const DEFAULT_AI_TEXT_VERBOSITY: TextVerbosity = "medium";
+const DEFAULT_SPEC_CACHE_TTL_SECONDS = 3600;
 
 const AI_SYSTEM_INSTRUCTIONS = [
   "You are a senior website copywriter for salon and beauty businesses in India.",
@@ -240,7 +247,7 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
-    const prompt = buildSiteSpecPrompt({
+    const normalizedInput = {
       templateId: String(body.templateId).trim(),
       siteType: String(body.siteType).trim() as "one_page" | "multipage",
       businessName: String(body.businessName).trim(),
@@ -251,7 +258,9 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
       address: String(body.address).trim(),
       hours: normalizeStringList(body.hours),
       services: normalizeStringList(body.services)
-    });
+    };
+
+    const prompt = buildSiteSpecPrompt(normalizedInput);
 
     const model = process.env.AI_MODEL || "gpt-5";
     const temperature = parseNumericEnv(process.env.AI_TEMPERATURE, DEFAULT_AI_TEMPERATURE, 0, 2);
@@ -262,7 +271,26 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
     const reasoningEffort = parseReasoningEffort(process.env.AI_REASONING_EFFORT);
     const reasoningEnabled = supportsReasoningConfig(model);
     const temperatureEnabled = supportsTemperatureConfig(model);
+    const specCacheTtlSeconds = Math.round(
+      parseNumericEnv(process.env.SPEC_CACHE_TTL_SECONDS, DEFAULT_SPEC_CACHE_TTL_SECONDS, 60, 86400)
+    );
+    const cacheKey = buildGeneratedSpecCacheKey({
+      input: normalizedInput,
+      model,
+      temperature: temperatureEnabled ? temperature : null,
+      textVerbosity,
+      reasoningEffort: reasoningEnabled ? reasoningEffort : null
+    });
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const cachedSpec = await getCachedGeneratedSpec<unknown>(cacheKey, request.log);
+    if (cachedSpec) {
+      const cachedMigrated = migrateGalleryStringsToImages(cachedSpec);
+      const cachedParsed = SiteSpecSchema.safeParse(cachedMigrated);
+      if (cachedParsed.success) {
+        return reply.send({ spec: cachedParsed.data, source: "redis_cache" });
+      }
+    }
 
     let response: unknown;
     try {
@@ -330,6 +358,26 @@ export async function demoRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
-    return reply.send({ spec: parsed.data });
+    const specRecord = parsed.data as unknown as Record<string, unknown>;
+    const normalizedInputRecord = normalizedInput as unknown as Record<string, unknown>;
+
+    await cacheGeneratedSpec(cacheKey, specRecord, specCacheTtlSeconds, request.log);
+    const specId = await saveGeneratedSpec(
+      {
+        templateId: normalizedInput.templateId,
+        siteType: normalizedInput.siteType,
+        businessName: normalizedInput.businessName,
+        city: normalizedInput.city,
+        model,
+        input: normalizedInputRecord,
+        spec: specRecord
+      },
+      request.log
+    );
+
+    return reply.send({
+      spec: parsed.data,
+      ...(specId ? { specId } : {})
+    });
   });
 }

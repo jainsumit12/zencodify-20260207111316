@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "pnpm --filter @zencodify/shared build && concurrently \"pnpm --filter @zencodify/backend dev\" \"pnpm --filter @zencodify/frontend dev\"",
     "build": "pnpm --filter @zencodify/shared build && pnpm --filter @zencodify/backend build && pnpm --filter @zencodify/frontend build",
+    "build:static": "pnpm --filter @zencodify/shared build && pnpm --filter @zencodify/frontend build:static",
+    "serve:static": "pnpm --filter @zencodify/frontend serve:static",
     "lint": "pnpm --filter @zencodify/shared build && pnpm -r run lint"
   },
   "devDependencies": {

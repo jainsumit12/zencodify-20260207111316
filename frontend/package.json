@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "NEXT_STATIC_EXPORT=1 next build",
     "start": "next start",
+    "serve:static": "python3 -m http.server 4173 --directory out",
     "lint": "next lint"
   },
   "dependencies": {

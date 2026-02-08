@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 
 import { SiteSpecSchema, migrateGalleryStringsToImages } from "@zencodify/shared";
 import { demoRoutes } from "./routes/demo";
+import { closeStorage, getStorageStatus, initializeStorage } from "./storage";
 
 function loadEnvironment(): string | null {
   const candidates = [
@@ -51,9 +52,17 @@ const start = async () => {
       allowedHeaders: ["Content-Type", "Authorization"],
     });
 
+    await initializeStorage(app.log);
+    app.addHook("onClose", async () => {
+      await closeStorage(app.log);
+    });
+
     // health route
     app.get("/health", async () => {
-      return { ok: true };
+      return {
+        ok: true,
+        storage: getStorageStatus()
+      };
     });
 
     // schema validation route
